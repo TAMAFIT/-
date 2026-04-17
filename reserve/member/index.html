@@ -6,27 +6,19 @@
   <title>たまフィット - 会員様専用予約</title>
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <style>
-    /* スマホ（LINE内）で綺麗に見せるための基本設定 */
     body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #f7f9fa; color: #333; margin: 0; padding: 20px; display: flex; justify-content: center; }
     .container { background: #ffffff; padding: 30px 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); width: 100%; max-width: 450px; box-sizing: border-box; }
     .header { text-align: center; margin-bottom: 25px; border-bottom: 3px solid #2ea14c; padding-bottom: 15px; }
     .header h1 { margin: 0; font-size: 22px; color: #1a1a1a; letter-spacing: 1px; }
-    
-    /* 案内メッセージのカード */
     .welcome-card { background: #eef9f1; border: 1px solid #c3e6cb; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-weight: bold; color: #155724; font-size: 15px; line-height: 1.5; }
     .info-text { text-align: center; font-size: 14px; color: #666; margin-bottom: 20px; line-height: 1.6; }
-    
-    /* 入力フォームとボタン */
     .input-group { margin-bottom: 20px; }
     label { display: block; font-size: 14px; font-weight: bold; margin-bottom: 8px; color: #444; }
     input[type="text"], input[type="date"], select { width: 100%; padding: 14px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 16px; background-color: #fafafa; appearance: none; }
-    
     .btn { width: 100%; padding: 16px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; box-sizing: border-box; }
     .btn-primary { background-color: #2ea14c; color: white; box-shadow: 0 2px 6px rgba(46,161,76,0.3); }
     .btn-primary:disabled { background-color: #a0d8b0; cursor: not-allowed; box-shadow: none; }
     .btn-outline { background-color: white; border: 2px solid #2ea14c; color: #2ea14c; margin-top: 10px; }
-    
-    /* セクションの切り替え用 */
     .view-section { display: none; margin-top: 25px; padding-top: 25px; border-top: 1px dashed #ddd; }
     #loading { text-align: center; padding: 50px 0; font-weight: bold; color: #2ea14c; }
     #statusMsg { text-align: center; margin-top: 20px; font-weight: bold; font-size: 16px; }
@@ -96,14 +88,12 @@
 </div>
 
 <script>
-  // 大林さんの環境設定
   const GAS_URL = "https://script.google.com/macros/s/AKfycbwk--BBlH7rg_VF9WDfqlvcmloBydipwdK60CVEk1fvPunvSTvR5IkbMxNbyHhmSDuS/exec";
   const LIFF_ID = "2009803249-QQEbOzvg";
   
   let userProfile = null;
   let memberInfo = null;
 
-  // 初期化とLINE連携チェック
   async function init() {
     try {
       await liff.init({ liffId: LIFF_ID });
@@ -126,24 +116,19 @@
     }
   }
 
-  // 連携・登録の表示切り替え
   function showView(v) {
     document.getElementById('linkView').style.display = (v === 'linkView' ? 'block' : 'none');
     document.getElementById('regView').style.display = (v === 'regView' ? 'block' : 'none');
   }
 
-  // 予約画面の表示（過去日付防止の設定もここ）
   function showBooking(m) {
     memberInfo = m;
     document.getElementById('authArea').style.display = 'none';
     document.getElementById('bookingArea').style.display = 'block';
     document.getElementById('welcomeMsg').innerHTML = `${m.name} 様<br>いつもご利用ありがとうございます！`;
-    
-    // 今日より前の日付を選択できないようにする安全装置
     document.getElementById('bookDate').setAttribute('min', new Date().toISOString().split('T')[0]);
   }
 
-  // 【API】既存番号との連携
   async function linkMember() {
     const id = document.getElementById('linkId').value.trim();
     const name = document.getElementById('linkName').value.trim();
@@ -167,7 +152,6 @@
     btn.textContent = "LINEと連携する";
   }
 
-  // 【API】新規登録
   async function registerMember() {
     const name = document.getElementById('regName').value.trim();
     const kana = document.getElementById('regKana').value.trim();
@@ -192,7 +176,6 @@
     btn.textContent = "会員情報を登録する";
   }
 
-  // 【API】空き時間の取得
   async function loadSlots() {
     const d = document.getElementById('bookDate').value;
     const s = document.getElementById('bookTime');
@@ -210,7 +193,6 @@
     } catch(e) { s.innerHTML = '<option value="" disabled selected>取得エラー</option>'; }
   }
 
-  // 【API】予約の確定
   async function submitBooking() {
     const d = document.getElementById('bookDate').value;
     const t = document.getElementById('bookTime').value;
@@ -234,7 +216,6 @@
     } catch(e) { alert("通信エラーが発生しました。"); btn.disabled = false; btn.textContent = "予約を確定する"; }
   }
 
-  // 画面ロード時に実行
   init();
 </script>
 </body>
