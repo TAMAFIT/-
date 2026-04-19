@@ -61,10 +61,10 @@
     <div class="header">
       <h1>たまフィット</h1>
     </div>
-    <p class="info-text">会員情報の確認ができませんでした。<br>該当する方を選択して登録を完了してください。</p>
+    <p class="info-text">会員情報の確認ができませんでした。<br>お手数ですが、ログインしてください。</p>
     
-    <button class="btn btn-primary" onclick="showView('linkView')">会員番号をお持ちの方</button>
-    <button class="btn btn-outline" onclick="showView('regView')">はじめての方（新規登録）</button>
+    <button class="btn btn-primary" onclick="showView('linkView')">会員番号でログイン</button>
+    <button class="btn btn-outline" onclick="showView('regView')">新規入会の方はこちら</button>
 
     <div id="linkView" class="view-section">
       <div class="input-group">
@@ -75,7 +75,7 @@
         <label>お名前（フルネーム）</label>
         <input type="text" id="linkName" placeholder="例: 山田 太郎">
       </div>
-      <button class="btn btn-primary" id="linkBtn" onclick="linkMember()">LINEと連携する</button>
+      <button class="btn btn-primary" id="linkBtn" onclick="linkMember()">ログインする</button>
     </div>
 
     <div id="regView" class="view-section">
@@ -95,21 +95,17 @@
     <div class="header">
       <h1>たまフィット 予約</h1>
     </div>
-    
     <div class="welcome-card" id="welcomeMsg"></div>
-    
     <div class="input-group">
       <label>予約希望日</label>
       <input type="date" id="bookDate" class="date-time-btn pulse-anim" onchange="loadSlots()">
     </div>
-    
     <div class="input-group">
       <label>予約時間</label>
       <select id="bookTime" class="date-time-btn">
         <option value="" disabled selected>日にちを先に選んでください</option>
       </select>
     </div>
-    
     <button class="btn btn-primary" id="bookBtn" onclick="submitBooking()">予約を確定する</button>
     <div id="statusMsg"></div>
   </div>
@@ -135,19 +131,18 @@
         return; 
       }
       
-      // ★修正箇所：エラーが出たら、公式の正しい手順で古い情報を捨ててログインし直す
+      // ★改善：ID取得に失敗しても「無視して」次の処理へ進む
       try {
         userProfile = await liff.getProfile();
-      } catch (profileError) {
-        console.warn('Profile Error (Token Revoked):', profileError);
-        liff.logout(); // 古い許可証を捨てる
-        liff.login();  // 新しい許可証をもらいに行く（画面が自動でリロードされます）
-        return;
+      } catch (e) {
+        console.warn('ID取得スキップ:', e);
       }
 
       loadingText.textContent = "会員データを照会中...";
       
-      const res = await fetch(`${GAS_URL}?action=getMember&lineId=${userProfile.userId}`);
+      // IDが取れていれば照合、取れていなければ強制的にログイン画面へ
+      let lineIdParam = userProfile ? userProfile.userId : "none";
+      const res = await fetch(`${GAS_URL}?action=getMember&lineId=${lineIdParam}`);
       const result = await res.json();
       
       loadingBox.style.display = 'none';
@@ -158,8 +153,9 @@
         document.getElementById('authArea').style.display = 'block';
       }
     } catch (err) {
-      console.error('LIFF Init Error:', err);
-      loadingBox.innerHTML = '<div style="color:#d9534f; font-weight:bold;">通信エラーが発生しました。<br>画面を閉じて再度お試しください。</div>';
+      console.error('最終エラー:', err);
+      loadingBox.style.display = 'none';
+      document.getElementById('authArea').style.display = 'block';
     }
   }
 
@@ -180,74 +176,47 @@
     const id = document.getElementById('linkId').value.trim();
     const name = document.getElementById('linkName').value.trim();
     if(!id || !name) return alert("すべての項目を入力してください。");
-    
     const btn = document.getElementById('linkBtn');
-    btn.disabled = true;
-    btn.textContent = "連携中...";
-    
+    btn.disabled = true; btn.textContent = "ログイン中...";
     try {
-      const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action:"linkMember", memberId:id, name:name, lineId:userProfile.userId }) });
+      let lid = userProfile ? userProfile.userId : "";
+      const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action:"linkMember", memberId:id, name:name, lineId:lid }) });
       const r = await res.json();
-      if(r.status === "success") { 
-        showBooking(r.member); 
-      } else { 
-        alert(r.message); 
-      }
-    } catch(e) { alert("エラーが発生しました。"); }
-    
-    btn.disabled = false;
-    btn.textContent = "LINEと連携する";
+      if(r.status === "success") { showBooking(r.member); } else { alert(r.message); }
+    } catch(e) { alert("通信エラーが発生しました。"); }
+    btn.disabled = false; btn.textContent = "ログインする";
   }
 
   async function registerMember() {
     const name = document.getElementById('regName').value.trim();
     const kana = document.getElementById('regKana').value.trim();
     if(!name || !kana) return alert("すべての項目を入力してください。");
-    
     const btn = document.getElementById('regBtn');
-    btn.disabled = true;
-    btn.textContent = "登録中...";
-    
+    btn.disabled = true; btn.textContent = "登録中...";
     try {
-      const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action:"registerMember", name:name, kana:kana, lineId:userProfile.userId }) });
+      let lid = userProfile ? userProfile.userId : "";
+      const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action:"registerMember", name:name, kana:kana, lineId:lid }) });
       const r = await res.json();
-      if(r.status === "success") { 
-        alert("登録が完了しました！続けて予約を行えます。");
-        showBooking(r.member); 
-      } else { 
-        alert(r.message); 
-      }
-    } catch(e) { alert("エラーが発生しました。"); }
-    
-    btn.disabled = false;
-    btn.textContent = "会員情報を登録する";
+      if(r.status === "success") { alert("登録完了！"); showBooking(r.member); } else { alert(r.message); }
+    } catch(e) { alert("通信エラーが発生しました。"); }
+    btn.disabled = false; btn.textContent = "会員情報を登録する";
   }
 
   async function loadSlots() {
     const d = document.getElementById('bookDate').value;
     const s = document.getElementById('bookTime');
     const dateInput = document.getElementById('bookDate');
-    
     dateInput.classList.remove('pulse-anim');
     s.classList.add('pulse-anim');
-
     s.innerHTML = '<option value="" disabled selected>確認中...</option>';
-    
     try {
       const res = await fetch(`${GAS_URL}?date=${d}`);
       const data = await res.json();
       s.innerHTML = '<option value="" disabled selected>時間を選択してください</option>';
       if(data.availableSlots && data.availableSlots.length > 0) {
         data.availableSlots.forEach(t => { const o = document.createElement('option'); o.value = t; o.textContent = t; s.appendChild(o); });
-      } else { 
-        s.innerHTML = '<option value="" disabled selected>空き枠がありません</option>'; 
-        s.classList.remove('pulse-anim');
-      }
-    } catch(e) { 
-      s.innerHTML = '<option value="" disabled selected>取得エラー</option>'; 
-      s.classList.remove('pulse-anim');
-    }
-    
+      } else { s.innerHTML = '<option value="" disabled selected>空き枠なし</option>'; s.classList.remove('pulse-anim'); }
+    } catch(e) { s.innerHTML = '<option value="" disabled selected>取得エラー</option>'; s.classList.remove('pulse-anim'); }
     s.addEventListener('change', () => s.classList.remove('pulse-anim'));
   }
 
@@ -255,23 +224,17 @@
     const d = document.getElementById('bookDate').value;
     const t = document.getElementById('bookTime').value;
     if(!d || !t) return alert("希望日と時間を選択してください。");
-    
     const btn = document.getElementById('bookBtn');
-    btn.disabled = true;
-    btn.textContent = "送信中...";
-    
+    btn.disabled = true; btn.textContent = "送信中...";
     try {
-      const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ type:"member", memberId:memberInfo.memberId, name:memberInfo.name, lineId:userProfile.userId, date:d, time:t, menu:memberInfo.plan }) });
+      let lid = userProfile ? userProfile.userId : "";
+      const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ type:"member", memberId:memberInfo.memberId, name:memberInfo.name, lineId:lid, date:d, time:t, menu:memberInfo.plan }) });
       const r = await res.json();
       if(r.status === "success") {
-        document.getElementById('statusMsg').innerHTML = '<span style="color:#2ea14c;">予約が完了しました！<br>LINEをご確認ください。</span>';
+        document.getElementById('statusMsg').innerHTML = '<span style="color:#2ea14c;">予約完了！</span>';
         setTimeout(() => liff.closeWindow(), 2500);
-      } else {
-        alert("予約に失敗しました: " + r.message);
-        btn.disabled = false;
-        btn.textContent = "予約を確定する";
-      }
-    } catch(e) { alert("通信エラーが発生しました。"); btn.disabled = false; btn.textContent = "予約を確定する"; }
+      } else { alert("失敗: " + r.message); btn.disabled = false; btn.textContent = "予約を確定する"; }
+    } catch(e) { alert("通信エラー"); btn.disabled = false; btn.textContent = "予約を確定する"; }
   }
 
   init();
