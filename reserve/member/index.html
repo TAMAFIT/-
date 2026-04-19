@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>たまフィット - 会員様専用予約</title>
+  <title>たまフィット - スマート予約システム</title>
   <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <style>
+    /* 大林さんのこだわりデザインを完全統合 */
     body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #f7f9fa; color: #333; margin: 0; padding: 20px; display: flex; justify-content: center; }
     .container { background: #ffffff; padding: 30px 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); width: 100%; max-width: 450px; box-sizing: border-box; }
     .header { text-align: center; margin-bottom: 25px; border-bottom: 3px solid #2ea14c; padding-bottom: 15px; }
@@ -16,35 +17,26 @@
     .input-group { margin-bottom: 20px; }
     label { display: block; font-size: 14px; font-weight: bold; margin-bottom: 8px; color: #444; }
     
-    input[type="text"] { width: 100%; padding: 14px; border: 2px solid #eee; border-radius: 8px; font-size: 16px; box-sizing: border-box; background-color: #fff; }
-    input[type="text"]::placeholder { color: #aaa; }
+    input[type="text"], input[type="email"], select, input[type="date"] { width: 100%; padding: 14px; border: 2px solid #eee; border-radius: 8px; font-size: 16px; box-sizing: border-box; background-color: #fff; }
     
-    .date-time-btn { 
-      width: 100%; padding: 16px; border: 1px solid #c3e6cb; border-radius: 8px; 
-      font-size: 16px; font-weight: bold; color: #155724; background-color: #eef9f1; 
-      text-align: center; cursor: pointer; appearance: none; box-sizing: border-box;
-    }
+    .date-time-btn { width: 100%; padding: 16px; border: 1px solid #c3e6cb; border-radius: 8px; font-size: 16px; font-weight: bold; color: #155724; background-color: #eef9f1; text-align: center; cursor: pointer; appearance: none; }
     
     .pulse-anim { animation: pulse 1.5s infinite; }
-    @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(46, 161, 76, 0.4); }
-      70% { box-shadow: 0 0 0 10px rgba(46, 161, 76, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(46, 161, 76, 0); }
-    }
+    @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(46, 161, 76, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(46, 161, 76, 0); } 100% { box-shadow: 0 0 0 0 rgba(46, 161, 76, 0); } }
 
-    .btn { width: 100%; padding: 16px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; box-sizing: border-box; }
-    .btn-primary { background-color: #2ea14c; color: white; box-shadow: 0 2px 6px rgba(46,161,76,0.3); margin-top: 10px; }
-    .btn-primary:disabled { background-color: #a0d8b0; cursor: not-allowed; box-shadow: none; }
-    .btn-outline { background-color: white; border: 2px solid #2ea14c; color: #2ea14c; margin-top: 10px; }
+    .btn { width: 100%; padding: 16px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; box-sizing: border-box; margin-top: 10px; }
+    .btn-primary { background-color: #2ea14c; color: white; box-shadow: 0 2px 6px rgba(46,161,76,0.3); }
+    .btn-primary:disabled { background-color: #a0d8b0; cursor: not-allowed; }
+    .btn-outline { background-color: white; border: 2px solid #2ea14c; color: #2ea14c; }
+    .btn-trial { background-color: #007bff; color: white; } /* 体験用カラー */
     
     .view-section { display: none; margin-top: 25px; padding-top: 25px; border-top: 1px dashed #ddd; }
+    .notes { font-size: 13px; color: #d9534f; margin-bottom: 15px; text-align: center; font-weight: bold; background: #fdf0f0; padding: 12px; border-radius: 8px; line-height: 1.4; }
     
     #loadingBox { text-align: center; padding: 40px 0; }
     .spinner { margin: 0 auto 15px; width: 40px; height: 40px; border: 4px solid #eef9f1; border-top: 4px solid #2ea14c; border-radius: 50%; animation: spin 1s linear infinite; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    #loadingText { font-weight: bold; color: #2ea14c; font-size: 16px; margin-bottom: 5px; }
-    .loading-sub { font-size: 12px; color: #888; }
-    
+    #loadingText { font-weight: bold; color: #2ea14c; font-size: 16px; }
     #statusMsg { text-align: center; margin-top: 20px; font-weight: bold; font-size: 16px; }
   </style>
 </head>
@@ -54,118 +46,92 @@
   <div id="loadingBox">
     <div class="spinner"></div>
     <div id="loadingText">システムを準備中...</div>
-    <div class="loading-sub">※初回は通信に数秒かかる場合があります</div>
   </div>
 
   <div id="authArea" style="display:none;">
-    <div class="header">
-      <h1>たまフィット</h1>
-    </div>
-    <p class="info-text">会員情報の確認ができませんでした。<br>お手数ですが、ログインしてください。</p>
-    
-    <button class="btn btn-primary" onclick="showView('linkView')">会員番号でログイン</button>
-    <button class="btn btn-outline" onclick="showView('regView')">新規入会の方はこちら</button>
+    <div class="header"><h1>たまフィット</h1></div>
+    <p class="info-text">ご希望のメニューを選択してください。</p>
+    <button class="btn btn-primary" onclick="showView('linkView')">会員の方（ログイン）</button>
+    <button class="btn btn-trial" onclick="showView('trialFormView')">無料体験の予約</button>
+    <button class="btn btn-outline" onclick="showView('regView')">新規入会（登録のみ）</button>
 
     <div id="linkView" class="view-section">
-      <div class="input-group">
-        <label>会員番号</label>
-        <input type="text" id="linkId" placeholder="例: 25120001">
-      </div>
-      <div class="input-group">
-        <label>お名前（フルネーム）</label>
-        <input type="text" id="linkName" placeholder="例: 山田 太郎">
-      </div>
+      <div class="input-group"><label>会員番号</label><input type="text" id="linkId" placeholder="例: 25120001"></div>
+      <div class="input-group"><label>お名前</label><input type="text" id="linkName" placeholder="例: 山田 太郎"></div>
       <button class="btn btn-primary" id="linkBtn" onclick="linkMember()">ログインする</button>
     </div>
 
     <div id="regView" class="view-section">
-      <div class="input-group">
-        <label>お名前（フルネーム）</label>
-        <input type="text" id="regName" placeholder="例: 山田 太郎">
-      </div>
-      <div class="input-group">
-        <label>フリガナ（カタカナ）</label>
-        <input type="text" id="regKana" placeholder="例: ヤマダ タロウ">
-      </div>
+      <div class="input-group"><label>お名前</label><input type="text" id="regName" placeholder="例: 山田 太郎"></div>
+      <div class="input-group"><label>フリガナ</label><input type="text" id="regKana" placeholder="例: ヤマダ タロウ"></div>
       <button class="btn btn-primary" id="regBtn" onclick="registerMember()">会員情報を登録する</button>
+    </div>
+
+    <div id="trialFormView" class="view-section">
+      <div class="input-group"><label>お名前</label><input type="text" id="tName" placeholder="例：山田 太郎"></div>
+      <div class="input-group"><label>フリガナ</label><input type="text" id="tKana" placeholder="例：ヤマダ タロウ"></div>
+      <div class="input-group"><label>予約希望日</label><input type="date" id="tDate" class="date-time-btn" onchange="loadSlots('trial')"></div>
+      <div class="input-group"><label>予約時間</label><select id="tTime" class="date-time-btn"><option value="" disabled selected>日を選んでください</option></select></div>
+      <div class="notes">※無料体験はお一人様1回までとなります。</div>
+      <button class="btn btn-trial" id="tBtn" onclick="submitBooking('trial')">体験予約を確定する</button>
     </div>
   </div>
 
   <div id="bookingArea" style="display:none;">
-    <div class="header">
-      <h1>たまフィット 予約</h1>
-    </div>
+    <div class="header"><h1>会員様 予約</h1></div>
     <div class="welcome-card" id="welcomeMsg"></div>
-    <div class="input-group">
-      <label>予約希望日</label>
-      <input type="date" id="bookDate" class="date-time-btn pulse-anim" onchange="loadSlots()">
-    </div>
-    <div class="input-group">
-      <label>予約時間</label>
-      <select id="bookTime" class="date-time-btn">
-        <option value="" disabled selected>日にちを先に選んでください</option>
-      </select>
-    </div>
-    <button class="btn btn-primary" id="bookBtn" onclick="submitBooking()">予約を確定する</button>
+    <div class="input-group"><label>予約希望日</label><input type="date" id="bookDate" class="date-time-btn pulse-anim" onchange="loadSlots('member')"></div>
+    <div class="input-group"><label>予約時間</label><select id="bookTime" class="date-time-btn"><option value="" disabled selected>日を選んでください</option></select></div>
+    <button class="btn btn-primary" id="bookBtn" onclick="submitBooking('member')">予約を確定する</button>
     <div id="statusMsg"></div>
   </div>
 </div>
 
 <script>
   const GAS_URL = "https://script.google.com/macros/s/AKfycbwk--BBlH7rg_VF9WDfqlvcmloBydipwdK60CVEk1fvPunvSTvR5IkbMxNbyHhmSDuS/exec";
-  const LIFF_ID = "2009803249-QQEbOzvg";
+  const LIFF_ID = "2009803249-QQEbOzvg"; // 統合版としてこちらを使用
   
   let userProfile = null;
   let memberInfo = null;
 
   async function init() {
     const loadingBox = document.getElementById('loadingBox');
+    const authArea = document.getElementById('authArea');
     
-    // ★最強の脱出タイマー：5秒経っても終わらなければ、問答無用でログイン画面を出す
+    // 5秒タイマー（LINEフリーズ対策）
     const fallbackTimer = setTimeout(() => {
-      console.warn("LINE init timed out. Forcing auth screen.");
       loadingBox.style.display = 'none';
-      document.getElementById('authArea').style.display = 'block';
+      authArea.style.display = 'block';
     }, 5000);
 
     try {
       await liff.init({ liffId: LIFF_ID });
+      if (!liff.isLoggedIn()) { clearTimeout(fallbackTimer); liff.login(); return; }
       
-      if (!liff.isLoggedIn()) { 
-        clearTimeout(fallbackTimer); // 正常に動いたらタイマー解除
-        liff.login(); 
-        return; 
-      }
-      
-      try {
-        userProfile = await liff.getProfile();
-      } catch (e) {
-        console.warn('ID取得スキップ:', e);
-      }
+      try { userProfile = await liff.getProfile(); } catch (e) { console.warn('ID取得スキップ'); }
       
       let lineIdParam = userProfile ? userProfile.userId : "none";
       const res = await fetch(`${GAS_URL}?action=getMember&lineId=${lineIdParam}`);
       const result = await res.json();
       
-      clearTimeout(fallbackTimer); // 全て正常に終わったらタイマー解除
+      clearTimeout(fallbackTimer);
       loadingBox.style.display = 'none';
       
       if (result.success) {
         showBooking(result.member);
       } else {
-        document.getElementById('authArea').style.display = 'block';
+        authArea.style.display = 'block';
       }
     } catch (err) {
-      console.error('最終エラー:', err);
       clearTimeout(fallbackTimer);
       loadingBox.style.display = 'none';
-      document.getElementById('authArea').style.display = 'block';
+      authArea.style.display = 'block';
     }
   }
 
   function showView(v) {
-    document.getElementById('linkView').style.display = (v === 'linkView' ? 'block' : 'none');
-    document.getElementById('regView').style.display = (v === 'regView' ? 'block' : 'none');
+    const sections = ['linkView', 'regView', 'trialFormView'];
+    sections.forEach(s => document.getElementById(s).style.display = (s === v ? 'block' : 'none'));
   }
 
   function showBooking(m) {
@@ -173,72 +139,89 @@
     document.getElementById('authArea').style.display = 'none';
     document.getElementById('bookingArea').style.display = 'block';
     document.getElementById('welcomeMsg').innerHTML = `${m.name} 様<br>いつもご利用ありがとうございます！`;
-    document.getElementById('bookDate').setAttribute('min', new Date().toISOString().split('T')[0]);
   }
 
+  // カレンダー制御（当日予約禁止：明日から選択可能）
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const minDateStr = tomorrow.toISOString().split('T')[0];
+  document.getElementById('bookDate').setAttribute('min', minDateStr);
+  document.getElementById('tDate').setAttribute('min', minDateStr);
+
+  async function loadSlots(mode) {
+    const dateInput = (mode === 'member') ? document.getElementById('bookDate') : document.getElementById('tDate');
+    const timeSelect = (mode === 'member') ? document.getElementById('bookTime') : document.getElementById('tTime');
+    
+    timeSelect.innerHTML = '<option value="" disabled selected>確認中...</option>';
+    try {
+      const res = await fetch(`${GAS_URL}?date=${dateInput.value}`);
+      const data = await res.json();
+      timeSelect.innerHTML = '<option value="" disabled selected>時間を選択してください</option>';
+      if(data.availableSlots && data.availableSlots.length > 0) {
+        data.availableSlots.forEach(t => { const o = document.createElement('option'); o.value = t; o.textContent = t; timeSelect.appendChild(o); });
+      } else { timeSelect.innerHTML = '<option value="" disabled selected>空き枠なし</option>'; }
+    } catch(e) { timeSelect.innerHTML = '<option value="" disabled selected>取得エラー</option>'; }
+  }
+
+  async function submitBooking(mode) {
+    const isMember = (mode === 'member');
+    const d = isMember ? document.getElementById('bookDate').value : document.getElementById('tDate').value;
+    const t = isMember ? document.getElementById('bookTime').value : document.getElementById('tTime').value;
+    const btn = isMember ? document.getElementById('bookBtn') : document.getElementById('tBtn');
+
+    if(!d || !t) return alert("希望日と時間を選択してください。");
+    btn.disabled = true; btn.textContent = "送信中...";
+
+    const payload = {
+      type: mode,
+      name: isMember ? memberInfo.name : document.getElementById('tName').value,
+      kana: isMember ? "" : document.getElementById('tKana').value,
+      memberId: isMember ? memberInfo.memberId : "",
+      lineId: userProfile ? userProfile.userId : "",
+      lineName: userProfile ? userProfile.displayName : "取得失敗",
+      date: d,
+      time: t,
+      menu: isMember ? (memberInfo.plan || "会員セッション") : "体験希望"
+    };
+
+    try {
+      const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
+      const r = await res.json();
+      if(r.status === "success") {
+        const msgArea = isMember ? document.getElementById('statusMsg') : document.getElementById('result-message');
+        msgArea.innerHTML = '<span style="color:#2ea14c; font-weight:bold;">予約完了！LINEをご確認ください。</span>';
+        setTimeout(() => liff.closeWindow(), 2500);
+      } else { alert("失敗: " + r.message); btn.disabled = false; btn.textContent = "予約を確定する"; }
+    } catch(e) { alert("通信エラー"); btn.disabled = false; }
+  }
+
+  /* 会員紐付け・新規登録関数は以前のロジックを完全継承 */
   async function linkMember() {
     const id = document.getElementById('linkId').value.trim();
     const name = document.getElementById('linkName').value.trim();
-    if(!id || !name) return alert("すべての項目を入力してください。");
     const btn = document.getElementById('linkBtn');
-    btn.disabled = true; btn.textContent = "ログイン中...";
+    if(!id || !name) return alert("入力してください。");
+    btn.disabled = true;
     try {
-      let lid = userProfile ? userProfile.userId : "";
-      const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action:"linkMember", memberId:id, name:name, lineId:lid }) });
+      const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action:"linkMember", memberId:id, name:name, lineId:userProfile?userProfile.userId:"", lineName:userProfile?userProfile.displayName:"" }) });
       const r = await res.json();
       if(r.status === "success") { showBooking(r.member); } else { alert(r.message); }
-    } catch(e) { alert("通信エラーが発生しました。"); }
-    btn.disabled = false; btn.textContent = "ログインする";
+    } catch(e) { alert("エラー"); }
+    btn.disabled = false;
   }
 
   async function registerMember() {
     const name = document.getElementById('regName').value.trim();
     const kana = document.getElementById('regKana').value.trim();
-    if(!name || !kana) return alert("すべての項目を入力してください。");
     const btn = document.getElementById('regBtn');
-    btn.disabled = true; btn.textContent = "登録中...";
+    if(!name || !kana) return alert("入力してください。");
+    btn.disabled = true;
     try {
-      let lid = userProfile ? userProfile.userId : "";
-      const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action:"registerMember", name:name, kana:kana, lineId:lid }) });
+      const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action:"registerMember", name:name, kana:kana, lineId:userProfile?userProfile.userId:"", lineName:userProfile?userProfile.displayName:"" }) });
       const r = await res.json();
       if(r.status === "success") { alert("登録完了！"); showBooking(r.member); } else { alert(r.message); }
-    } catch(e) { alert("通信エラーが発生しました。"); }
-    btn.disabled = false; btn.textContent = "会員情報を登録する";
-  }
-
-  async function loadSlots() {
-    const d = document.getElementById('bookDate').value;
-    const s = document.getElementById('bookTime');
-    const dateInput = document.getElementById('bookDate');
-    dateInput.classList.remove('pulse-anim');
-    s.classList.add('pulse-anim');
-    s.innerHTML = '<option value="" disabled selected>確認中...</option>';
-    try {
-      const res = await fetch(`${GAS_URL}?date=${d}`);
-      const data = await res.json();
-      s.innerHTML = '<option value="" disabled selected>時間を選択してください</option>';
-      if(data.availableSlots && data.availableSlots.length > 0) {
-        data.availableSlots.forEach(t => { const o = document.createElement('option'); o.value = t; o.textContent = t; s.appendChild(o); });
-      } else { s.innerHTML = '<option value="" disabled selected>空き枠なし</option>'; s.classList.remove('pulse-anim'); }
-    } catch(e) { s.innerHTML = '<option value="" disabled selected>取得エラー</option>'; s.classList.remove('pulse-anim'); }
-    s.addEventListener('change', () => s.classList.remove('pulse-anim'));
-  }
-
-  async function submitBooking() {
-    const d = document.getElementById('bookDate').value;
-    const t = document.getElementById('bookTime').value;
-    if(!d || !t) return alert("希望日と時間を選択してください。");
-    const btn = document.getElementById('bookBtn');
-    btn.disabled = true; btn.textContent = "送信中...";
-    try {
-      let lid = userProfile ? userProfile.userId : "";
-      const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ type:"member", memberId:memberInfo.memberId, name:memberInfo.name, lineId:lid, date:d, time:t, menu:memberInfo.plan }) });
-      const r = await res.json();
-      if(r.status === "success") {
-        document.getElementById('statusMsg').innerHTML = '<span style="color:#2ea14c;">予約完了！</span>';
-        setTimeout(() => liff.closeWindow(), 2500);
-      } else { alert("失敗: " + r.message); btn.disabled = false; btn.textContent = "予約を確定する"; }
-    } catch(e) { alert("通信エラー"); btn.disabled = false; btn.textContent = "予約を確定する"; }
+    } catch(e) { alert("エラー"); }
+    btn.disabled = false;
   }
 
   init();
