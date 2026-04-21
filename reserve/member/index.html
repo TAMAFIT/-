@@ -12,7 +12,6 @@
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
 
   <style>
-    /* ★ 背景画像とフォントの設定 */
     body { 
       font-family: 'Noto Sans JP', sans-serif; 
       background: url('../../images/18.webp') no-repeat center center fixed; 
@@ -27,7 +26,6 @@
       align-items: center;
     }
 
-    /* ★ すりガラス効果 */
     .container { 
       background: rgba(255, 255, 255, 0.6); 
       backdrop-filter: blur(15px) saturate(120%); 
@@ -45,7 +43,6 @@
     .header { text-align: center; margin-bottom: 30px; border-bottom: 3px solid #2ea14c; padding-bottom: 15px; }
     .header h1 { margin: 0; font-size: 28px; color: #1a1a1a; letter-spacing: 2px; font-weight: 900; text-shadow: 1px 1px 0px rgba(255,255,255,0.8); }
     
-    /* ★ 文字の変な改行を防ぐ設定を追加 */
     .welcome-card { 
       background: rgba(238, 249, 241, 0.9); 
       border: 1px solid #c3e6cb; 
@@ -60,20 +57,57 @@
       word-break: keep-all; 
     }
     
-    .input-group { margin-bottom: 20px; }
+    .input-group { margin-bottom: 20px; position: relative; }
     
     label { display: flex; align-items: center; gap: 4px; font-size: 14px; font-weight: bold; margin-bottom: 8px; color: #333; }
     .icon-label { color: #2ea14c; font-size: 18px; }
     
-    input[type="text"], input[type="email"], select, input[type="date"] { 
+    /* ★ 入力欄の基本スタイル */
+    input[type="text"], input[type="email"] { 
       width: 100%; padding: 14px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; box-sizing: border-box; background-color: rgba(255, 255, 255, 0.95); font-family: inherit; transition: 0.3s;
     }
     input:focus, select:focus { outline: none; border-color: #2ea14c; box-shadow: 0 0 0 3px rgba(46,161,76,0.2); }
     
-    .date-time-btn { width: 100%; padding: 16px; border: 1px solid #c3e6cb; border-radius: 8px; font-size: 16px; font-weight: bold; color: #155724; background-color: rgba(238, 249, 241, 0.9); text-align: center; cursor: pointer; appearance: none; font-family: inherit; }
+    /* ★ カスタムカレンダー＆プルダウンのデザイン（Androidバグ完全対応版） */
+    .date-time-btn { 
+      width: 100%; 
+      padding: 16px 40px 16px 16px; /* 右側にアイコン用の余白を確保 */
+      border: 1px solid #c3e6cb; 
+      border-radius: 8px; 
+      font-size: 16px; 
+      font-weight: bold; 
+      color: #155724; 
+      background-color: rgba(238, 249, 241, 0.9); 
+      text-align: left; /* 中央寄せから左寄せに変更して文字切れを防ぐ */
+      cursor: pointer; 
+      appearance: none; /* ブラウザ標準のダサい矢印やカレンダーアイコンを消す */
+      -webkit-appearance: none;
+      font-family: inherit; 
+      position: relative;
+    }
+    
+    /* Androidなどで日付が空の時に「年/月/日」をプレースホルダーとして強制表示 */
+    input[type="date"]::before {
+      content: attr(data-placeholder);
+      width: 100%;
+      color: #155724;
+    }
+    input[type="date"]:valid::before {
+      display: none; /* 日付が入力されたらプレースホルダーを消す */
+    }
+
+    /* 右側に配置する共通アイコンのスタイル */
+    .input-icon-right {
+      position: absolute;
+      right: 15px;
+      top: 42px; /* ラベルの高さ分ずらす */
+      color: #2ea14c;
+      pointer-events: none; /* アイコンの上からでもクリック可能にする */
+      font-size: 22px;
+    }
     
     .pulse-anim { animation: pulse 1.5s infinite; }
-    @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(46, 161, 76, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(46, 161, 76, 0); } 100% { box-shadow: 0 0 0 0 rgba(46, 161, 76, 0); } }
+    @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(46, 161, 76, 0.5); } 70% { box-shadow: 0 0 0 10px rgba(46, 161, 76, 0); } 100% { box-shadow: 0 0 0 0 rgba(46, 161, 76, 0); } }
 
     .btn { width: 100%; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; box-sizing: border-box; display: flex; align-items: center; justify-content: center; gap: 6px; font-family: inherit; }
     .btn-primary { background-color: #2ea14c; color: white; padding: 16px; font-size: 16px; margin-top: 10px; box-shadow: 0 4px 10px rgba(46,161,76,0.3); }
@@ -125,16 +159,15 @@
     }
     
     .rich-top { 
-      font-size: 22px; /* ★ 16pxから19pxに少し大きくしました */
+      font-size: 22px; 
       font-weight: 900; 
       margin-bottom: 6px; 
       text-shadow: 1px 1px 2px rgba(0,0,0,0.3); 
       letter-spacing: 1px; 
     }
     
-    /* ★ 画面幅に合わせて文字が自動調整されるように修正（孤立文字防止） */
     .rich-mid { 
-      font-size: clamp(20px, 6.5vw, 28px); /* スマホ幅に応じて20px〜28pxの間で自動伸縮 */
+      font-size: clamp(20px, 6.5vw, 28px); 
       font-weight: 900; 
       margin-bottom: 15px; 
       text-shadow: 1px 1px 4px rgba(0,0,0,0.3); 
@@ -213,14 +246,19 @@
         <label><i class="material-icons-round icon-label">sort_by_alpha</i> フリガナ</label>
         <input type="text" id="tKana" placeholder="例：ヤマダ タロウ">
       </div>
+      
       <div class="input-group">
         <label><i class="material-icons-round icon-label">event</i> 予約希望日</label>
-        <input type="date" id="tDate" class="date-time-btn" onchange="loadSlots('trial')">
+        <input type="date" id="tDate" class="date-time-btn pulse-anim" required data-placeholder="日付を選択してください" onchange="this.setAttribute('data-placeholder', ''); loadSlots('trial')">
+        <i class="material-icons-round input-icon-right">calendar_month</i>
       </div>
+      
       <div class="input-group">
         <label><i class="material-icons-round icon-label">schedule</i> 予約時間</label>
         <select id="tTime" class="date-time-btn"><option value="" disabled selected>日を選んでください</option></select>
+        <i class="material-icons-round input-icon-right">expand_more</i>
       </div>
+      
       <div class="notes"><span style="display: inline-block;">※無料体験は</span><span style="display: inline-block;">お一人様1回までと</span><span style="display: inline-block;">なります。</span></div>
       <div class="reservation-rule"><span style="display: inline-block;">当日予約不可 /</span> <span style="display: inline-block;">翌日予約は前日22:00締切</span></div>
       <button class="btn btn-primary" style="background-color: #20c997; font-size: 18px; padding: 18px;" id="tBtn" onclick="submitBooking('trial')">
@@ -271,14 +309,19 @@
   <div id="bookingArea" style="display:none;">
     <div class="header"><h1>会員様 予約</h1></div>
     <div class="welcome-card" id="welcomeMsg"></div>
+    
     <div class="input-group">
       <label><i class="material-icons-round icon-label">event</i> 予約希望日</label>
-      <input type="date" id="bookDate" class="date-time-btn pulse-anim" onchange="loadSlots('member')">
+      <input type="date" id="bookDate" class="date-time-btn pulse-anim" required data-placeholder="日付を選択してください" onchange="this.setAttribute('data-placeholder', ''); loadSlots('member')">
+      <i class="material-icons-round input-icon-right">calendar_month</i>
     </div>
+    
     <div class="input-group">
       <label><i class="material-icons-round icon-label">schedule</i> 予約時間</label>
       <select id="bookTime" class="date-time-btn"><option value="" disabled selected>日を選んでください</option></select>
+      <i class="material-icons-round input-icon-right">expand_more</i>
     </div>
+    
     <div class="reservation-rule"><span style="display: inline-block;">当日予約不可 /</span> <span style="display: inline-block;">翌日予約は前日22:00締切</span></div>
     <button class="btn btn-primary" id="bookBtn" onclick="submitBooking('member')">
       <i class="material-icons-round">send</i> 予約を確定する
