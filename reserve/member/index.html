@@ -24,12 +24,12 @@
       justify-content: center; 
       min-height: 100vh;
       box-sizing: border-box;
-      align-items: center; /* 画面中央に配置 */
+      align-items: center;
     }
 
-    /* ★ すりガラス効果（透け感アップ＆中央配置） */
+    /* ★ すりガラス効果 */
     .container { 
-      background: rgba(255, 255, 255, 0.6); /* 透明度を上げて透け感を強調（0.65から0.6へ） */
+      background: rgba(255, 255, 255, 0.6); 
       backdrop-filter: blur(15px) saturate(120%); 
       -webkit-backdrop-filter: blur(15px) saturate(120%); 
       border: 1px solid rgba(255, 255, 255, 0.7); 
@@ -39,14 +39,27 @@
       width: 100%; 
       max-width: 450px; 
       box-sizing: border-box; 
-      margin: 2vh 0; /* 上下余白 */
+      margin: 2vh 0;
     }
 
-    /* ★ ロゴ（タイトル） */
     .header { text-align: center; margin-bottom: 30px; border-bottom: 3px solid #2ea14c; padding-bottom: 15px; }
     .header h1 { margin: 0; font-size: 28px; color: #1a1a1a; letter-spacing: 2px; font-weight: 900; text-shadow: 1px 1px 0px rgba(255,255,255,0.8); }
     
-    .welcome-card { background: rgba(238, 249, 241, 0.9); border: 1px solid #c3e6cb; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-weight: bold; color: #155724; font-size: 15px; line-height: 1.5; }
+    /* ★ 文字の変な改行を防ぐ設定を追加 */
+    .welcome-card { 
+      background: rgba(238, 249, 241, 0.9); 
+      border: 1px solid #c3e6cb; 
+      padding: 15px; 
+      border-radius: 8px; 
+      margin-bottom: 20px; 
+      text-align: center; 
+      font-weight: bold; 
+      color: #155724; 
+      font-size: 15px; 
+      line-height: 1.6;
+      word-break: keep-all; 
+    }
+    
     .input-group { margin-bottom: 20px; }
     
     label { display: flex; align-items: center; gap: 4px; font-size: 14px; font-weight: bold; margin-bottom: 8px; color: #333; }
@@ -62,19 +75,16 @@
     .pulse-anim { animation: pulse 1.5s infinite; }
     @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(46, 161, 76, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(46, 161, 76, 0); } 100% { box-shadow: 0 0 0 0 rgba(46, 161, 76, 0); } }
 
-    /* ★ ボタンの共通スタイル */
     .btn { width: 100%; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; box-sizing: border-box; display: flex; align-items: center; justify-content: center; gap: 6px; font-family: inherit; }
     .btn-primary { background-color: #2ea14c; color: white; padding: 16px; font-size: 16px; margin-top: 10px; box-shadow: 0 4px 10px rgba(46,161,76,0.3); }
     .btn-primary:active { transform: translateY(2px); box-shadow: 0 2px 5px rgba(46,161,76,0.3); }
     .btn-primary:disabled { background-color: #a0d8b0; cursor: not-allowed; transform: none; box-shadow: none; }
     
-    /* ログイン・登録ボタン（すりガラスに溶け込む枠線スタイル） */
     .btn-outline { background-color: transparent; border: 2px solid #2ea14c; color: #2ea14c; padding: 16px; font-size: 16px; width: 100%; margin-top: 10px; }
     .btn-outline-gray { background-color: transparent; border: 2px solid #666; color: #666; padding: 16px; font-size: 16px; width: 100%; margin-top: 10px; }
     
-    /* ★ アコーディオン用の隠しセクション設定 */
     .view-section { 
-      display: none; /* 初期状態は隠す */
+      display: none; 
       margin-top: 10px; 
       padding: 20px; 
       background: rgba(255,255,255,0.7); 
@@ -83,22 +93,21 @@
       box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
     }
     
-    .notes { font-size: 13px; color: #d9534f; margin-bottom: 15px; text-align: center; font-weight: bold; background: rgba(253, 240, 240, 0.9); padding: 12px; border-radius: 8px; line-height: 1.4; border: 1px solid #f5c6cb; }
+    .notes { font-size: 13px; color: #d9534f; margin-bottom: 15px; text-align: center; font-weight: bold; background: rgba(253, 240, 240, 0.9); padding: 12px; border-radius: 8px; line-height: 1.4; border: 1px solid #f5c6cb; word-break: keep-all; }
     
-    .reservation-rule { font-size: 12px; color: #444; text-align: center; margin-bottom: 8px; letter-spacing: 0.5px; font-weight: bold; }
+    .reservation-rule { font-size: 12px; color: #444; text-align: center; margin-bottom: 8px; letter-spacing: 0.5px; font-weight: bold; word-break: keep-all; }
 
-    /* ★ リッチメニュー完全再現・【超特大】体験ボタン */
     .btn-rich-trial {
       position: relative;
-      background: linear-gradient(135deg, #06c755 55%, #04a040 55%); /* LINE風グリーンの斜め切り替え */
+      background: linear-gradient(135deg, #06c755 55%, #04a040 55%); 
       color: white;
-      padding: 25px 15px; /* 上下余白を増やしてデカく */
+      padding: 25px 15px; 
       border-radius: 12px;
       border: 3px solid #fff;
       box-shadow: 0 8px 20px rgba(0,0,0,0.2);
       width: 100%;
       margin-top: 10px;
-      overflow: visible; /* 🔰マークがはみ出せるように */
+      overflow: visible; 
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -106,56 +115,62 @@
     }
     .btn-rich-trial:active { transform: translateY(3px); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
     
-    /* 真っ直ぐ、デカい🔰マーク（フチに重なる） */
     .rich-badge {
       position: absolute;
-      top: -20px; /* 位置調整 */
+      top: -20px; 
       right: -10px;
-      font-size: 42px; /* 大幅に拡大 */
-      filter: drop-shadow(0 3px 6px rgba(0,0,0,0.4)); /* 影で立体感を */
-      transform: rotate(0deg); /* 真っ直ぐに */
+      font-size: 42px; 
+      filter: drop-shadow(0 3px 6px rgba(0,0,0,0.4)); 
+      transform: rotate(0deg); 
     }
     
-    .rich-top { font-size: 16px; font-weight: 900; margin-bottom: 6px; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); letter-spacing: 1px; }
-    /* 【超特大】メインコピー */
+    .rich-top { 
+      font-size: 16px; 
+      font-weight: 900; 
+      margin-bottom: 6px; 
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.3); 
+      letter-spacing: 1px; 
+    }
+    
+    /* ★ 画面幅に合わせて文字が自動調整されるように修正（孤立文字防止） */
     .rich-mid { 
-      font-size: 28px; /* HPのロゴ級に拡大 */
+      font-size: clamp(20px, 6.5vw, 28px); /* スマホ幅に応じて20px〜28pxの間で自動伸縮 */
       font-weight: 900; 
       margin-bottom: 15px; 
       text-shadow: 1px 1px 4px rgba(0,0,0,0.3); 
       letter-spacing: 1px; 
-      line-height: 1.1; 
+      line-height: 1.2; 
       width: 100%; 
       text-align: center;
+      word-break: keep-all; 
     }
     
-    /* 大きくなったカプセル型アクションエリア */
     .rich-action {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
       border: 2px solid #fff;
-      border-radius: 40px; /* 大きく */
-      padding: 10px 30px; /* 大きく */
-      font-size: 18px; /* 大きく */
+      border-radius: 40px; 
+      padding: 10px 30px; 
+      font-size: 18px; 
       font-weight: 900;
       background: rgba(255,255,255,0.2);
+      word-break: keep-all;
     }
 
-    /* 【高コントラスト】白背景＋緑アイコンのタップ誘導 */
     .tap-circle {
       position: relative;
-      width: 32px; /* 大きく */
-      height: 32px; /* 大きく */
-      background: #fff; /* 白背景に変更（コントラスト最高） */
+      width: 32px; 
+      height: 32px; 
+      background: #fff; 
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.4);
     }
-    .tap-circle i { color: #06c755; font-size: 20px; } /* アイコンを緑に変更 */
+    .tap-circle i { color: #06c755; font-size: 20px; } 
 
     #loadingBox { text-align: center; padding: 40px 0; }
     .spinner { margin: 0 auto 15px; width: 40px; height: 40px; border: 4px solid #eef9f1; border-top: 4px solid #2ea14c; border-radius: 50%; animation: spin 1s linear infinite; }
@@ -176,18 +191,19 @@
     <div class="header"><h1>たまフィット</h1></div>
     
     <div class="welcome-card">
-      初めての方は「無料体験」をご予約ください。
+      <span style="display: inline-block;">初めての方は</span><span style="display: inline-block;">「無料体験」を</span><span style="display: inline-block;">ご予約ください。</span>
     </div>
 
     <button class="btn btn-rich-trial" id="trialBtn" onclick="toggleView(this, 'trialFormView')">
       <div class="rich-badge">🔰</div>
       <span class="rich-top">初回60分</span>
-      <span class="rich-mid">無料体験予約はこちら</span>
+      <span class="rich-mid"><span style="display: inline-block;">無料体験予約は</span><span style="display: inline-block;">こちら</span></span>
       <div class="rich-action">
         <div class="tap-circle"><i class="material-icons-round">touch_app</i></div>
-        かんたん予約
+        <span style="display: inline-block;">かんたん予約</span>
       </div>
     </button>
+    
     <div id="trialFormView" class="view-section">
       <div class="input-group">
         <label><i class="material-icons-round icon-label">person</i> お名前</label>
@@ -205,8 +221,8 @@
         <label><i class="material-icons-round icon-label">schedule</i> 予約時間</label>
         <select id="tTime" class="date-time-btn"><option value="" disabled selected>日を選んでください</option></select>
       </div>
-      <div class="notes">※無料体験はお一人様1回までとなります。</div>
-      <div class="reservation-rule">当日予約不可 / 翌日予約は前日22:00締切</div>
+      <div class="notes"><span style="display: inline-block;">※無料体験は</span><span style="display: inline-block;">お一人様1回までと</span><span style="display: inline-block;">なります。</span></div>
+      <div class="reservation-rule"><span style="display: inline-block;">当日予約不可 /</span> <span style="display: inline-block;">翌日予約は前日22:00締切</span></div>
       <button class="btn btn-primary" style="background-color: #20c997; font-size: 18px; padding: 18px;" id="tBtn" onclick="submitBooking('trial')">
         <i class="material-icons-round">send</i> 体験予約を確定する
       </button>
@@ -263,7 +279,7 @@
       <label><i class="material-icons-round icon-label">schedule</i> 予約時間</label>
       <select id="bookTime" class="date-time-btn"><option value="" disabled selected>日を選んでください</option></select>
     </div>
-    <div class="reservation-rule">当日予約不可 / 翌日予約は前日22:00締切</div>
+    <div class="reservation-rule"><span style="display: inline-block;">当日予約不可 /</span> <span style="display: inline-block;">翌日予約は前日22:00締切</span></div>
     <button class="btn btn-primary" id="bookBtn" onclick="submitBooking('member')">
       <i class="material-icons-round">send</i> 予約を確定する
     </button>
@@ -300,7 +316,6 @@
       clearTimeout(fallbackTimer);
       loadingBox.style.display = 'none';
       
-      // ★修正箇所①：幽霊会員ブロック（正常稼働）
       if (result.success && result.member && result.member.name) { 
         showBooking(result.member); 
       } else { 
@@ -313,28 +328,22 @@
     }
   }
 
-  /* ★ UX革命：アコーディオンUI専用関数（直下のフォームを開閉） */
   function toggleView(btnEl, viewId) {
     const targetForm = document.getElementById(viewId);
     
-    // 他の開いているフォームをすべて閉じる
     const allForms = document.querySelectorAll('.view-section');
     allForms.forEach(f => {
       if (f.id !== viewId) f.style.display = 'none';
     });
     
-    // クリックされたボタンの直後のフォームの表示・非表示を切り替える
     if (targetForm.style.display === 'block') {
       targetForm.style.display = 'none';
     } else {
       targetForm.style.display = 'block';
-      // 開いたフォームの位置へ少しスクロール（親切心）
       setTimeout(() => targetForm.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
     }
   }
 
-  // 既存の showView は toggleView に統合したため、不要となったが、
-  // 紐付け関数内で使われているため、保険として残し、toggleView を呼ぶように修正。
   function showView(v) {
     const allForms = document.querySelectorAll('.view-section');
     allForms.forEach(f => {
@@ -349,7 +358,6 @@
     document.getElementById('welcomeMsg').innerHTML = `${m.name} 様<br>いつもご利用ありがとうございます！`;
   }
 
-  // カレンダー制限ロジック（正常稼働）
   const now = new Date();
   const minDate = new Date();
   
@@ -399,7 +407,6 @@
     if(!d || !t) return alert("希望日と時間を選択してください。");
     btn.disabled = true; btn.textContent = "送信中...";
 
-    // ★修正箇所②：お節介バグ駆除（正常稼働）
     const payload = {
       type: mode,
       name: isMember ? memberInfo.name : document.getElementById('tName').value,
