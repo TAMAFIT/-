@@ -23,11 +23,14 @@
     .pulse-anim { animation: pulse 1.5s infinite; }
     @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(46, 161, 76, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(46, 161, 76, 0); } 100% { box-shadow: 0 0 0 0 rgba(46, 161, 76, 0); } }
 
-    .btn { width: 100%; padding: 16px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; box-sizing: border-box; margin-top: 10px; }
-    .btn-primary { background-color: #2ea14c; color: white; box-shadow: 0 2px 6px rgba(46,161,76,0.3); }
+    /* ★デザイン案B：ボタンの強弱設定のためのスタイル更新 */
+    .btn { width: 100%; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; box-sizing: border-box; display: block; text-align: center; }
+    .btn-primary { background-color: #2ea14c; color: white; padding: 16px; font-size: 16px; margin-top: 10px; box-shadow: 0 2px 6px rgba(46,161,76,0.3); }
     .btn-primary:disabled { background-color: #a0d8b0; cursor: not-allowed; }
-    .btn-outline { background-color: white; border: 2px solid #2ea14c; color: #2ea14c; }
-    .btn-trial { background-color: #007bff; color: white; }
+    
+    .btn-trial-main { background-color: #007bff; color: white; padding: 20px; font-size: 18px; box-shadow: 0 4px 10px rgba(0,123,255,0.3); width: 100%; margin-top: 10px; }
+    .btn-outline { background-color: transparent; border: 2px solid #2ea14c; color: #2ea14c; padding: 14px; font-size: 14px; width: 100%; margin-bottom: 12px; }
+    .btn-outline-gray { background-color: transparent; border: 2px solid #888; color: #888; padding: 14px; font-size: 14px; width: 100%; }
     
     .view-section { display: none; margin-top: 25px; padding-top: 25px; border-top: 1px dashed #ddd; }
     .notes { font-size: 13px; color: #d9534f; margin-bottom: 15px; text-align: center; font-weight: bold; background: #fdf0f0; padding: 12px; border-radius: 8px; line-height: 1.4; }
@@ -51,10 +54,15 @@
 
   <div id="authArea" style="display:none;">
     <div class="header"><h1>たまフィット</h1></div>
-    <p class="info-text">ご希望のメニューを選択してください。</p>
-    <button class="btn btn-primary" onclick="showView('linkView')">会員の方（ログイン）</button>
-    <button class="btn btn-trial" onclick="showView('trialFormView')">無料体験の予約</button>
-    <button class="btn btn-outline" onclick="showView('regView')">新規入会（登録のみ）</button>
+    
+    <p class="info-text" style="font-weight:bold; color: #111;">初めての方は「無料体験」をご予約ください。</p>
+    <button class="btn btn-trial-main" onclick="showView('trialFormView')">🎁 無料体験を予約する</button>
+
+    <div style="margin-top: 35px; padding-top: 20px; border-top: 1px dashed #ddd;">
+      <p style="font-size: 12px; color: #888; text-align: center; margin-bottom: 15px;">すでに会員の方・ご入会手続きのみの方</p>
+      <button class="btn btn-outline" onclick="showView('linkView')">👤 会員の方（ログイン）</button>
+      <button class="btn btn-outline-gray" onclick="showView('regView')">📝 新規入会（登録のみ）</button>
+    </div>
 
     <div id="linkView" class="view-section">
       <div class="input-group"><label>会員番号</label><input type="text" id="linkId" placeholder="例: 25120001"></div>
@@ -77,7 +85,7 @@
       <div class="notes">※無料体験はお一人様1回までとなります。</div>
 
       <div class="reservation-rule">当日予約不可 / 翌日予約は前日22:00締切</div>
-      <button class="btn btn-trial" id="tBtn" onclick="submitBooking('trial')">体験予約を確定する</button>
+      <button class="btn btn-trial-main" id="tBtn" onclick="submitBooking('trial')">体験予約を確定する</button>
       <div id="trialStatusMsg" class="status-msg"></div> 
     </div>
   </div>
@@ -139,7 +147,10 @@
 
   function showView(v) {
     const sections = ['linkView', 'regView', 'trialFormView'];
-    sections.forEach(s => document.getElementById(s).style.display = (s === v ? 'block' : 'none'));
+    sections.forEach(s => {
+      const el = document.getElementById(s);
+      if(el) el.style.display = (s === v ? 'block' : 'none');
+    });
   }
 
   function showBooking(m) {
